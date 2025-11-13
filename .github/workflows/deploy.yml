@@ -22,7 +22,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     
-    # Build and push mceutik API image
+    # Build and push mceutik image
     - name: Build and push mceutik API Docker image
       uses: docker/build-push-action@v5
       with:
@@ -41,7 +41,15 @@ jobs:
     
     - name: Create .env file
       run: |
-        echo "FLASK_API_KEY=${{ secrets.FLASK_API_KEY }}" > .env
+        echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
+        echo "DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}" >> .env
+        echo "MAIL_DEFAULT_SENDER=${{ secrets.MAIL_DEFAULT_SENDER }}" >> .env
+        echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+        echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> .env
+        echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
+        echo "MAIL_USE_TLS=${{ secrets.MAIL_USE_TLS }}" >> .env
+        echo "MAIL_SERVER=${{ secrets.MAIL_SERVER }}" >> .env
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
     
     - name: Copy files to EC2
       uses: appleboy/scp-action@v0.1.4
@@ -51,7 +59,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
         source: "docker-compose.yml,nginx.conf,.env"
-        target: /home/${{ secrets.EC2_USER }}/projects/mceutik/
+        target: /home/${{ secrets.EC2_USER }}/projects/freelance/mceutik/
     
     - name: Deploy on EC2
       uses: appleboy/ssh-action@v0.1.6
@@ -61,7 +69,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          cd /home/${{ secrets.EC2_USER }}/projects/mceutik
+          cd /home/${{ secrets.EC2_USER }}/projects/freelance/mceutik
           
           # Log in to Docker Hub on EC2
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | sudo docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
@@ -83,8 +91,4 @@ jobs:
           
           # Show container status
           sudo docker-compose ps
-          
-          # Test health endpoint (optional)
-          echo "Testing health endpoint..."
-          sleep 5
-          curl -f http://localhost/health -H "X-API-KEY: ${{ secrets.FLASK_API_KEY }}" || echo "Health check failed"
+        

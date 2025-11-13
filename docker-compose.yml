@@ -8,7 +8,15 @@ services:
     networks:
       - mceutik-internal
     environment:
+      DOCKERHUB_USERNAME: ${DOCKERHUB_USERNAME}
       FLASK_API_KEY: ${FLASK_API_KEY}
+      MAIL_DEFAULT_SENDER: ${MAIL_DEFAULT_SENDER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_USE_TLS: ${MAIL_USE_TLS}
+      MAIL_SERVER: ${MAIL_SERVER}
+      DATABASE_URL: ${DATABASE_URL}
       PORT: 4000
     command: gunicorn --bind 0.0.0.0:4000 --workers 2 --timeout 120 app:app
 
