@@ -11,9 +11,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # --- Configuration de la base de données ---
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.getenv('DATABASE_URL') or 'sqlite:///default.db'
-)
+app.config['SQLALCHEMY_DATABASE_URI'] = ('sqlite:///default.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # --- Configuration de Flask-Mail ---
